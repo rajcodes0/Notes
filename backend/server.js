@@ -13,6 +13,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// FIX __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,10 +25,13 @@ app.use(express.json());
 app.use(rate_limiter);
 app.use("/api/notes", notesRoutes);
 
+// ✅ EXPRESS 5 SAFE FRONTEND SERVE
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.use(
+    express.static(path.join(__dirname, "../frontend/dist"))
+  );
 
-  app.get("/*", (req, res) => {
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(
       path.join(__dirname, "../frontend/dist/index.html")
     );
